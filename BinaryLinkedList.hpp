@@ -3,6 +3,7 @@
 #include <string>
 #include <stdexcept>
 #include <cmath>
+#include <cassert>
 
 #include "BinaryLinkedListElement.hpp"
 
@@ -65,12 +66,21 @@ public:
 		}
 	}
 	
-	T operator[](uint64_t index) {
+	T &operator[](uint64_t index) {
+		assert(index >= 0 && index < size);
 		BinaryLinkedListElement<T> *element = primaryElement;
 		while (element->index != index) {
 			element = element->index > index ? element->child1 : element->child2;
 		}
 		return element->value;
+	}
+	const T &operator[](uint64_t index) const {
+		assert(index >= 0 && index < size);
+		BinaryLinkedListElement<T> *element = primaryElement;
+		while (element->index != index) {
+			element = element->index > index ? element->child1 : element->child2;
+		}
+		return &element->value;
 	}
 	
 	~BinaryLinkedList() {
