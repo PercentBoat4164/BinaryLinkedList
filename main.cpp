@@ -3,7 +3,12 @@
 #include <iostream>
 
 int main() {
-	BinaryLinkedList<int> binaryLinkedList{99999};
-	binaryLinkedList[99998] = 100;
-	std::cout << binaryLinkedList[99998] << std::endl;
+	BinaryLinkedList<int> binaryLinkedList{10};
+	int elementNumber = 0;
+	for (int &element : binaryLinkedList) {
+		element = elementNumber++;
+	}
+	for (int element : binaryLinkedList) {
+		std::cout << element << std::endl;
+	}
 }

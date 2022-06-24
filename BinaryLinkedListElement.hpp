@@ -5,6 +5,6 @@ public:
 	uint64_t index{};
 	uint64_t depth{};
 	BinaryLinkedListElement<T> *parent{};
-	BinaryLinkedListElement<T> *child2{};
 	BinaryLinkedListElement<T> *child1{};
+	BinaryLinkedListElement<T> *child2{};
 };
