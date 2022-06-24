@@ -6,52 +6,62 @@
 
 #include "BinaryLinkedListElement.hpp"
 
-template<typename T> class BinaryLinkedList {
+template<typename T>
+class BinaryLinkedList {
 	BinaryLinkedListElement<T> *primaryElement = new BinaryLinkedListElement<T>{};
 	uint64_t size = 0;
 	uint64_t maxDepth = 0;
-	
+
 public:
 	BinaryLinkedList() = default;
 	
 	explicit BinaryLinkedList(uint64_t initialSize) {
-		primaryElement->depth = 1;
-		primaryElement->index = floor((double_t) initialSize / 2);
-		maxDepth = (uint64_t) floor(log2((double_t) initialSize)) + 1;
-		uint64_t currentAllocation = pow(2, maxDepth + 1) - 1;
-		uint64_t overAllocation = currentAllocation - initialSize;
-		BinaryLinkedListElement<T> *parent = primaryElement;
-		while (true) {
-			if (parent->child1 == nullptr) {
-				parent->child1 = new BinaryLinkedListElement<T>{};
-				parent->child1->index = floor(parent->index / 2);  /**@todo Calculate index*/
-				parent->child1->parent = parent;
-				parent->child1->depth = parent->depth + 1;
-			} else if (parent->child2 == nullptr) {
-				parent->child2 = new BinaryLinkedListElement<T>{};
-				parent->child2->index = floor(parent->index / 2);  /**@todo Calculate index*/
-				parent->child2->parent = parent;
-				parent->child2->depth = parent->depth + 1;
-			} else parent = parent->child2;
-			
-			++size;
-			
-			// Handle what happens when the tree is complete
-			if (size == initialSize) {
-				break;
+		maxDepth = (uint64_t) log2((double_t) initialSize) + 1;
+		uint64_t spacesToBeUsedAtMaxDepth = initialSize - (uint64_t) (pow(2, maxDepth - 1) - 1);
+		uint64_t elementsInMaxDepth = 0;
+		uint64_t currentIndex = 0;
+		
+		// Initialize first element
+		BinaryLinkedListElement<T> *element = primaryElement;
+		element->depth = 1;
+		element->index = UINT64_MAX;
+		
+		// Create binary tree
+		while (++size < initialSize) {
+			// If at bottom, go up one layer
+			if (element->depth == maxDepth || (element->depth == maxDepth - 1 && spacesToBeUsedAtMaxDepth <= elementsInMaxDepth)) {
+				++elementsInMaxDepth;
+				if (element->index == UINT64_MAX) element->index = currentIndex++;
+				element = element->parent;
+				if (element->index == UINT64_MAX) element->index = currentIndex++;
 			}
 			
-			// Handle what happens at the bottom of the tree
-			if (parent->depth == maxDepth || (overAllocation <= currentAllocation && parent->depth == maxDepth - 1)) {
-				--currentAllocation;
-				while (parent->child2 != nullptr) {
-					parent = parent->parent;
-				}
-				continue;
+			// Create one of two children
+			if (element->child1 == nullptr) {  // Build child 1
+				element->child1 = new BinaryLinkedListElement<T>{};
+				element->child1->index = UINT64_MAX;
+				element->child1->parent = element;
+				element->child1->depth = element->depth + 1;
+				element = element->child1;  // Treat child 1 as start of new branch
+			} else if (element->child2 == nullptr) {  // Build child 2
+				element->child2 = new BinaryLinkedListElement<T>{};
+				element->child2->index = UINT64_MAX;
+				element->child2->parent = element;
+				element->child2->depth = element->depth + 1;
+				element = element->child2;  // Treat child 2 as start of new branch
+			} else {  // If this branch is completely built
+				--size;  // This path does not actually create a new element
+				if (element->index == UINT64_MAX) element->index = currentIndex++;
+				element = element->parent;
+				if (element->index == UINT64_MAX) element->index = currentIndex++;
 			}
-			
-			parent = parent->child2 != nullptr ? parent->child2 : parent->child1;
-			
+		}
+		
+		// Generate indices on far right side of tree
+		while (element != primaryElement) {
+			if (element->index == UINT64_MAX) element->index = currentIndex++;
+			element = element->parent;
+			if (element->index == UINT64_MAX) element->index = currentIndex++;
 		}
 	}
 	
