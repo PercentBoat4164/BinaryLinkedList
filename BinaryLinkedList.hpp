@@ -1,30 +1,52 @@
 #pragma once
 
+#include "BinaryLinkedListElement.hpp"
+
+#include <cstdint>
 #include <cmath>
 #include <cassert>
 #include <iterator>
 
-#include "BinaryLinkedListElement.hpp"
-
 template<typename T> class BinaryLinkedList {
+private:
 	BinaryLinkedListElement<T> *primaryElement = new BinaryLinkedListElement<T>{};
 	uint64_t size = 0;
 	uint64_t maxDepth = 0;
 
 public:
 	class iterator {
+	private:
+		uint64_t _index{};
+		BinaryLinkedList<T> *_binaryLinkedList;
+		
 	public:
-		explicit iterator(BinaryLinkedList<T> *bll, uint64_t index) {
+		typedef std::random_access_iterator_tag iterator_category;
+		typedef uint64_t value_type;
+		typedef std::ptrdiff_t difference_type;
+		typedef uint64_t* pointer;
+		typedef uint64_t& reference;
+		
+		iterator() = default;
+		
+		explicit iterator(BinaryLinkedList<T> *binaryLinkedList, uint64_t index) {
 			_index = index;
-			_bll = bll;
+			_binaryLinkedList = binaryLinkedList;
 		}
 		
 		T &operator*() {
-			return _bll->operator[](_index);
+			return _binaryLinkedList->operator[](_index);
 		}
 		
-		T *operator->() {
-			return _bll->operator[](_index);
+		iterator operator++(int) {
+			iterator temp = *this;
+			++*this;
+			return temp;
+		}
+		
+		iterator operator--(int) {
+			iterator temp = *this;
+			--*this;
+			return temp;
 		}
 		
 		iterator &operator++() {
@@ -32,13 +54,98 @@ public:
 			return *this;
 		}
 		
+		iterator &operator--() {
+			--_index;
+			return *this;
+		}
+		
+		iterator &operator+=(const iterator &other) {
+			_index += other._index;
+			return *this;
+		}
+		
+		iterator &operator-=(const iterator &other) {
+			_index -= other._index;
+			return *this;
+		}
+		
+		iterator &operator+=(const uint64_t offset) {
+			_index += offset;
+			return *this;
+		}
+		
+		iterator &operator-=(const uint64_t offset) {
+			_index -= offset;
+			return *this;
+		}
+		
+		uint64_t operator+(const iterator &other) {
+			return _index + other._index;
+		}
+		
+		uint64_t operator-(const iterator &other) {
+			return _index - other._index;
+		}
+		
+		uint64_t operator+(const uint64_t &offset) {
+			return _index + offset;
+		}
+		
+		uint64_t operator-(const uint64_t &offset) {
+			return _index - offset;
+		}
+		
+		bool operator<(const iterator &other) {
+			return _index < other._index;
+		}
+		
+		bool operator>(const iterator &other) {
+			return _index > other._index;
+		}
+		
+		bool operator<=(const iterator &other) {
+			return _index <= other._index;
+		}
+		
+		bool operator>=(const iterator &other) {
+			return _index >= other._index;
+		}
+		
+		bool operator<(const uint64_t &other) {
+			return _index < other;
+		}
+		
+		bool operator>(const uint64_t &other) {
+			return _index > other;
+		}
+		
+		bool operator<=(const uint64_t &other) {
+			return _index <= other;
+		}
+		
+		bool operator>=(const uint64_t &other) {
+			return _index >= other;
+		}
+		
 		friend bool operator==(const iterator &a, const iterator &b) {
 			return a._index == b._index;
 		}
 		
-	private:
-		uint64_t _index;
-		BinaryLinkedList<T> *_bll;
+		friend bool operator!=(const iterator &a, const iterator &b) {
+			return a._index != b._index;
+		}
+		
+		friend bool operator==(const iterator &a, const uint64_t &b) {
+			return a._index == b;
+		}
+		
+		friend bool operator!=(const iterator &a, const uint64_t &b) {
+			return a._index != b;
+		}
+		
+		T &operator[](uint64_t offset) {
+			return _binaryLinkedList->operator[](_index + offset);
+		}
 	};
 	
 	iterator begin() {

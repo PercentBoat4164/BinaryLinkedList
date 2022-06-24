@@ -1,4 +1,7 @@
 #pragma  once
+
+#include <cstdint>
+
 template<typename T> class BinaryLinkedListElement {
 public:
 	T value{};
