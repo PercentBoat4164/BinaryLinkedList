@@ -14,14 +14,17 @@ template<typename T> class BinaryLinkedList {
 public:
 	class iterator {
 	public:
-		explicit iterator(uint64_t index) : _index(index) {}
-		
-		uint64_t &operator*() {
-			return _index;
+		explicit iterator(BinaryLinkedList<T> *bll, uint64_t index) {
+			_index = index;
+			_bll = bll;
 		}
 		
-		uint64_t *operator->() {
-			return _index;
+		T &operator*() {
+			return _bll->operator[](_index);
+		}
+		
+		T *operator->() {
+			return _bll->operator[](_index);
 		}
 		
 		iterator &operator++() {
@@ -33,20 +36,17 @@ public:
 			return a._index == b._index;
 		}
 		
-		friend bool operator!=(const iterator &a, const iterator &b) {
-			return a._index != b._index;
-		}
-		
 	private:
 		uint64_t _index;
+		BinaryLinkedList<T> *_bll;
 	};
 	
 	iterator begin() {
-		return iterator(0);
+		return iterator(this, 0);
 	}
 	
 	iterator end() {
-		return iterator(size);
+		return iterator(this, size);
 	}
 	
 	BinaryLinkedList() = default;
@@ -113,14 +113,6 @@ public:
 		BinaryLinkedListElement<T> *element = primaryElement;
 		while (element->index != index) element = element->index > index ? element->child1 : element->child2;
 		return &element->value;
-	}
-	
-	T &operator[](iterator indexIterator) {
-		return operator[](*indexIterator);
-	}
-	
-	const T &operator[](iterator indexIterator) const {
-		return operator[](*indexIterator);
 	}
 	
 	~BinaryLinkedList() {
