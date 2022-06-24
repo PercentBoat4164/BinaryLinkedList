@@ -74,15 +74,19 @@ public:
 	}
 	
 	~BinaryLinkedList() {
-//		BinaryLinkedListElement<T> *node = primaryElement;
-//		while (node != nullptr) {
-//			BinaryLinkedListElement<T> *next = node->child1;
-//			node->child1 = nullptr;
-//			if (next != nullptr) {
-//				next = node->child2 != nullptr ? node->child2 : node->parent;
-//				delete next;
-//			}
-//			next = node->child2;
-//		}
+		BinaryLinkedListElement<T> *element = primaryElement;
+		BinaryLinkedListElement<T> *temp;
+		while (element != nullptr) {
+			if (element->child1 != nullptr) element = element->child1;
+			else if (element->child2 != nullptr) element = element->child2;
+			else {
+				if (element == primaryElement) break;
+				if (element->parent->child1 == element) element->parent->child1 = nullptr;
+				else element->parent->child2 = nullptr;
+				delete element;
+				element = primaryElement;
+			}
+		}
+		delete primaryElement;
 	}
 };
