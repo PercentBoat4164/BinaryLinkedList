@@ -66,7 +66,11 @@ public:
 	}
 	
 	T operator[](uint64_t index) {
-		return primaryElement->value;
+		BinaryLinkedListElement<T> *element = primaryElement;
+		while (element->index != index) {
+			element = element->index > index ? element->child1 : element->child2;
+		}
+		return element->value;
 	}
 	
 	~BinaryLinkedList() {
