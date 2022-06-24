@@ -4,6 +4,12 @@
 
 int main() {
 	BinaryLinkedList<int> binaryLinkedList{99999};
-	binaryLinkedList[99998] = 100;
-	std::cout << binaryLinkedList[99998] << std::endl;
+	uint64_t elementNumber = 0;
+	for (int element : binaryLinkedList) {
+		element += elementNumber++;
+	}
+	
+	for (int element : binaryLinkedList) {
+		std::cout << element << std::endl;
+	}
 }

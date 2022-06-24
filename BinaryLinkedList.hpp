@@ -1,19 +1,54 @@
 #pragma once
 
-#include <string>
-#include <stdexcept>
 #include <cmath>
 #include <cassert>
+#include <iterator>
 
 #include "BinaryLinkedListElement.hpp"
 
-template<typename T>
-class BinaryLinkedList {
+template<typename T> class BinaryLinkedList {
 	BinaryLinkedListElement<T> *primaryElement = new BinaryLinkedListElement<T>{};
 	uint64_t size = 0;
 	uint64_t maxDepth = 0;
 
 public:
+	class iterator {
+	public:
+		explicit iterator(uint64_t index) : _index(index) {}
+		
+		uint64_t &operator*() {
+			return _index;
+		}
+		
+		uint64_t *operator->() {
+			return _index;
+		}
+		
+		iterator &operator++() {
+			++_index;
+			return *this;
+		}
+		
+		friend bool operator==(const iterator &a, const iterator &b) {
+			return a._index == b._index;
+		}
+		
+		friend bool operator!=(const iterator &a, const iterator &b) {
+			return a._index != b._index;
+		}
+		
+	private:
+		uint64_t _index;
+	};
+	
+	iterator begin() {
+		return iterator(0);
+	}
+	
+	iterator end() {
+		return iterator(size);
+	}
+	
 	BinaryLinkedList() = default;
 	
 	explicit BinaryLinkedList(uint64_t initialSize) {
@@ -69,23 +104,27 @@ public:
 	T &operator[](uint64_t index) {
 		assert(index >= 0 && index < size);
 		BinaryLinkedListElement<T> *element = primaryElement;
-		while (element->index != index) {
-			element = element->index > index ? element->child1 : element->child2;
-		}
+		while (element->index != index) element = element->index > index ? element->child1 : element->child2;
 		return element->value;
 	}
+	
 	const T &operator[](uint64_t index) const {
 		assert(index >= 0 && index < size);
 		BinaryLinkedListElement<T> *element = primaryElement;
-		while (element->index != index) {
-			element = element->index > index ? element->child1 : element->child2;
-		}
+		while (element->index != index) element = element->index > index ? element->child1 : element->child2;
 		return &element->value;
+	}
+	
+	T &operator[](iterator indexIterator) {
+		return operator[](*indexIterator);
+	}
+	
+	const T &operator[](iterator indexIterator) const {
+		return operator[](*indexIterator);
 	}
 	
 	~BinaryLinkedList() {
 		BinaryLinkedListElement<T> *element = primaryElement;
-		BinaryLinkedListElement<T> *temp;
 		while (element != nullptr) {
 			if (element->child1 != nullptr) element = element->child1;
 			else if (element->child2 != nullptr) element = element->child2;
